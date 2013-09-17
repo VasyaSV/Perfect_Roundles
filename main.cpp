@@ -1,12 +1,13 @@
 // Search roundles
 
 #include <iostream>
+#include <fstream>
 #include <list>
 #include <string>
 #include <conio.h>
 using namespace std;
-typedef /*unsigned long*/ int uli;
-const uli LAST_ELEMENT = 100000;// 0.5 for max
+typedef unsigned long int uli;
+const uli LAST_ELEMENT = 1000000;// 0.5 for max
 // el roundleys
 struct el_round{
     uli ch;
@@ -112,9 +113,11 @@ int main()
 {
     list <el_round> l_roundlayes; // части хороводов в том числе и просто перспективные
     list <uli> max_roundlaye; // максимальный хоровод
-    cout << sum_befor_div(4600);
-    cout << " " << sum_befor_div(sum_befor_div(4600)) ;
-
+    uli last;
+    //cout << sum_befor_div(4600);
+    //cout << " " << sum_befor_div(sum_befor_div(4600)) ;
+    cout << "Enter max: ";
+    cin >> last;
 
     for (uli cur = 1; l_roundlayes.size() < LAST_ELEMENT; cur++)
     {
@@ -144,8 +147,18 @@ int main()
             cur_roundlaye.push_back(buble);
         }
         merge(cur_roundlaye, l_roundlayes, cur);// добавим элементы в l_roundlayes
-        if (cur % 1000 == 0)
-            cout << cur << " max = " << max_roundlaye.size() << "\n";
+        //if (cur % 1000 == 0)
+       // {
+           // cout << cur << " max = " << max_roundlaye.size() << "\n";
+            if (cur == last)
+            {
+                ofstream out("out.txt");
+                out << max_roundlaye.size() << "\n";
+                for (list <uli>::iterator i = max_roundlaye.begin(); i != max_roundlaye.end(); ++i)
+                    out << (*i) << " ";
+                break;
+            }
+       // }
     }
     cout << "found roundlaye for diapozon [1.." << LAST_ELEMENT <<"]\n" ;
     cout << "it's long = " << max_roundlaye.size() << "\n";
