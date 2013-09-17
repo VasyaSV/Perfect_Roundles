@@ -147,20 +147,19 @@ int main()
             cur_roundlaye.push_back(buble);
         }
         merge(cur_roundlaye, l_roundlayes, cur);// добавим элементы в l_roundlayes
-        //if (cur % 1000 == 0)
-       // {
-           // cout << cur << " max = " << max_roundlaye.size() << "\n";
-            if (cur == last)
-            {
-                ofstream out("out.txt");
-                out << max_roundlaye.size() << "\n";
-                for (list <uli>::iterator i = max_roundlaye.begin(); i != max_roundlaye.end(); ++i)
-                    out << (*i) << " ";
-                break;
-            }
-       // }
+         if  (cur % (last/10) == 0)
+            cout << "\n" << 100*cur/last << "%";
+        if (cur == last)
+        {
+            cout << "\n100% well done \n";
+            ofstream out("out.txt");
+            out << max_roundlaye.size() << "\n";
+            for (list <uli>::iterator i = max_roundlaye.begin(); i != max_roundlaye.end(); ++i)
+                out << (*i) << " ";
+            break;
+        }
     }
-    cout << "found roundlaye for diapozon [1.." << LAST_ELEMENT <<"]\n" ;
+    cout << "found roundlaye for diapozon [1.." << last <<"]\n" ;
     cout << "it's long = " << max_roundlaye.size() << "\n";
     cout << "roundlaye: ";
     for (list <uli>::iterator i = max_roundlaye.begin(); i != max_roundlaye.end(); ++i)
