@@ -77,7 +77,7 @@ void clear_l_roundlayes(list <el_round> &l_roundlayes, uli cur){
         if ((*i).last_ch > cur)
             continue;
         else{ // иначе перещитываем
-            uli bouble = sum_befor_div((*i).last_ch);
+            uli bouble = sum_befor_div((*i).last_ch);// xzxz
             for (; bouble < cur && found(bouble, l_roundlayes); bouble = sum_befor_div(bouble))
                 ;
             (*i).last_ch = bouble;
@@ -91,7 +91,7 @@ void clear_l_roundlayes(list <el_round> &l_roundlayes, uli cur){
 void merge(list <uli> roundlaye, list <el_round> &l_roundlayes, uli cur){
     if (roundlaye.empty())
         return;
-    clear_l_roundlayes(l_roundlayes, cur);
+    //clear_l_roundlayes(l_roundlayes, cur);
     for (list <uli>::iterator i = roundlaye.begin(); i != roundlaye.end(); ++i)
     {
         list <el_round>::iterator j = l_roundlayes.begin();
@@ -121,6 +121,7 @@ int main()
 
     for (uli cur = 1; l_roundlayes.size() < LAST_ELEMENT; cur++)
     {
+        clear_l_roundlayes(l_roundlayes, cur);
         list <uli> cur_roundlaye;
         cur_roundlaye.push_back(cur);
         for (uli buble = sum_befor_div(cur); ; buble = sum_befor_div(buble)) // начнем хоровод с текущего (cur)
@@ -147,7 +148,7 @@ int main()
             cur_roundlaye.push_back(buble);
         }
         merge(cur_roundlaye, l_roundlayes, cur);// добавим элементы в l_roundlayes
-         if  (cur % (last/10) == 0)
+        if  (cur % (last/10) == 0)
             cout << "\n" << 100*cur/last << "%";
         if (cur == last)
         {
