@@ -170,7 +170,7 @@ int main(int argc, char *argv[])
 
     cultivate_arg(argc, argv, last, num_check, out_name);
     time_list.push_back(get_time());
-    cout << "\nLocal time is: " << *(time_list.begin()) << "\n Program begin\n";
+    cout << "\nLocal time is: " << get_time() << "\n Program begin\n";
     cout << "Timer is 0 \n";
 
     for (uli cur = 1; l_roundlayes.size() < LAST_ELEMENT; cur++)
@@ -212,6 +212,7 @@ int main(int argc, char *argv[])
         {
             cout << "\n100% well done \n";
             time_list.push_back(get_time()-time_list.front());
+            time_list.pop_front();
             cout<<"Timer is: " << time_list.back();
             ofstream out(out_name);
             out << max_roundlaye.size() << "\n";
