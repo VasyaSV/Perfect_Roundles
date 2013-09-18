@@ -1,13 +1,16 @@
-// Search roundles
+// Search roundles max size and max number first
 
 #include <iostream>
 #include <fstream>
 #include <list>
 #include <string>
 #include <conio.h>
+#include <iostream>
+#include <time.h>
+#include <stdio.h>
 using namespace std;
 typedef unsigned long int uli;
-const uli LAST_ELEMENT = 1000000;// 0.5 for max
+const uli LAST_ELEMENT = 1000000;// unsigned long int max 18446744073709551615
 // el roundleys
 struct el_round{
     uli ch;
@@ -83,7 +86,6 @@ void clear_l_roundlayes(list <el_round> &l_roundlayes, uli cur){
             (*i).last_ch = bouble;
             if (bouble < cur)
                 kill_list.push_back((*i).ch);
-            //cout << (*i).ch;
         }
     kill(kill_list, l_roundlayes);
 }
@@ -108,23 +110,75 @@ void merge(list <uli> roundlaye, list <el_round> &l_roundlayes, uli cur){
     }
 }
 
+uli get_time(){
+    time_t t;
+    tm *t_m;
+    t=time(NULL);
+    t_m=localtime(&t);
+    return t_m->tm_hour*60 + t_m->tm_min*60 + t_m->tm_sec;
+}
 
-int main()
+void cultivate_arg(int argc, char *argv[], uli &last, uli &num_check, string &out_name){
+    switch (argc)
+    { // сквозной свич
+    case 1:
+        cout << "Enter max: ";
+        cin >> last;
+    case 2:
+        cout << "Enter number checks: ";
+        cin >> num_check;
+    case 3:
+        cout << "Enter out file name: ";
+        cin >> out_name;
+    default:;
+    }
+    switch (argc)
+    { // сквозной свич
+    case 4:
+        out_name = argv[3];
+    case 3:
+        sscanf(argv[2],"%d", &num_check);
+    case 2:
+        sscanf(argv[3],"%d", &last);
+    default:;
+    }
+    cout << "\n Last set: " << last <<
+            "\n Number check set: " << num_check <<
+            "\n Name out file set: " << out_name;
+
+}
+// Arrgs:
+//######################################################
+//# number # meaning        # varyable  # default      #
+//######################################################
+//# 1      # last           # last      #  10000       #
+//# 2      # number checks  # num_check #  10          #
+//# 3      # name out file  # out_name  #  out.txt     #
+//######################################################
+int main(int argc, char *argv[])
 {
     list <el_round> l_roundlayes; // части хороводов в том числе и просто перспективные
     list <uli> max_roundlaye; // максимальный хоровод
+    list <int> time_list;
+    string out_name;
     uli last;
-    //cout << sum_befor_div(4600);
+    uli num_check; // number cout << progres << time
+//    cout << "15472 == " <<
+//            sum_bbefor_div(sum_befor_div(sum_befor_div(sum_befor_div(sum_befor_div(15472)))))
+//         << "\n";
     //cout << " " << sum_befor_div(sum_befor_div(4600)) ;
-    cout << "Enter max: ";
-    cin >> last;
+
+    cultivate_arg(argc, argv, last, num_check, out_name);
+    time_list.push_back(get_time());
+    cout << "\nLocal time is: " << *(time_list.begin()) << "\n Program begin\n";
+    cout << "Timer is 0 \n";
 
     for (uli cur = 1; l_roundlayes.size() < LAST_ELEMENT; cur++)
-    {
-        clear_l_roundlayes(l_roundlayes, cur);
+    {//  clear_l_roundlayes(l_roundlayes, cur);
         list <uli> cur_roundlaye;
         cur_roundlaye.push_back(cur);
-        for (uli buble = sum_befor_div(cur); ; buble = sum_befor_div(buble)) // начнем хоровод с текущего (cur)
+        uli buble = sum_befor_div(cur);
+        for (;; buble = sum_befor_div(buble)) // начнем хоровод с текущего (cur)
         {
             if (buble > cur) // цепочка возможно нас устраивает, может она хоровод? пусть живет, пака
             {
@@ -138,9 +192,7 @@ int main()
             {
                 if (buble == cur) // да это цепочка - хоровод
                     if (cur_roundlaye.size() >= max_roundlaye.size()) // и длинна подходящая
-                        // там >= поскольку сейчас ищем максимальные хороводы
                         max_roundlaye = cur_roundlaye; // "я тебя запомнил, сейчас ты достойней всех"
-                // поиск
                 kill(cur_roundlaye, l_roundlayes); // больше не ты, не твои части, не нужны, умри
                 cur_roundlaye.clear();
                 break;
@@ -148,24 +200,35 @@ int main()
             cur_roundlaye.push_back(buble);
         }
         merge(cur_roundlaye, l_roundlayes, cur);// добавим элементы в l_roundlayes
-        if  (cur % (last/10) == 0)
-            cout << "\n" << 100*cur/last << "%";
+        if (num_check)
+            if  (cur % (last/num_check) == 0)
+            {// clear_l_roundlayes(l_roundlayes, cur);
+                cout << "\n!" << 100*cur/last << "%";
+                time_list.push_back(get_time()-time_list.front());
+                cout<<"Timer is: " << time_list.back();
+
+            }
         if (cur == last)
         {
             cout << "\n100% well done \n";
-            ofstream out("out.txt");
+            time_list.push_back(get_time()-time_list.front());
+            cout<<"Timer is: " << time_list.back();
+            ofstream out(out_name);
             out << max_roundlaye.size() << "\n";
             for (list <uli>::iterator i = max_roundlaye.begin(); i != max_roundlaye.end(); ++i)
+                out << (*i) << " ";
+            out << "\n" << time_list.size();
+            out << "\n";
+            for (list <int>::iterator i = time_list.begin(); i != time_list.end(); ++i)
                 out << (*i) << " ";
             break;
         }
     }
-    cout << "found roundlaye for diapozon [1.." << last <<"]\n" ;
+    cout << "\nfound roundlaye for diapozon [1.." << last <<"]\n" ;
     cout << "it's long = " << max_roundlaye.size() << "\n";
     cout << "roundlaye: ";
     for (list <uli>::iterator i = max_roundlaye.begin(); i != max_roundlaye.end(); ++i)
         cout << *i << " ";
-    _getch();
     return 0;
 }
 
