@@ -10,8 +10,9 @@
 #include <stdio.h>
 using namespace std;
 typedef unsigned long int uli;
-const uli LAST_ELEMENT = 1000000;// unsigned long int max 18446744073709551615
+const uli LAST_ELEMENT = 100000000; // unsigned long int max 18446744073709551615
 // el roundleys
+bool *hash_table;
 struct el_round{
     uli ch;
     uli last_ch;
@@ -25,6 +26,8 @@ void kill(list <uli> list_sacrifises, list <el_round> &real_sacrifises){
         for (list <el_round>::iterator j = real_sacrifises.begin(); j != real_sacrifises.end(); ++j)
             if ((*i)==(*j).ch)
             {
+                //el_round tmp;
+                hash_table[*i]=0;
                 real_sacrifises.erase(j);
                 break;
             }
@@ -54,6 +57,8 @@ uli sum_div(uli num){ // Сложность O(sqrt(n))
           }
           if (k > 1)
              sum *= ((k * i) - 1)/(i - 1);
+          if (sum > LAST_ELEMENT) //he he, krisha, potolok!=)
+              return LAST_ELEMENT-1;
        }
        if (num > 1)
           sum *= num + 1;
@@ -67,30 +72,29 @@ uli sum_befor_div(uli num){
     return temp;
 }
 
-bool found(uli element, list <el_round> l){
-    for (list <el_round>::iterator i = l.begin(); i != l.end(); ++i)
-        if ((*i).ch == element)
-            return true;
-    return false;
+bool found(uli element){
+    return hash_table[element];
 }
 
-void clear_l_roundlayes(list <el_round> &l_roundlayes, uli cur){
-    list <uli> kill_list;
-    for (list <el_round>::iterator i = l_roundlayes.begin(); i != l_roundlayes.end() ; ++i)
-        if ((*i).last_ch > cur)
-            continue;
-        else{ // иначе перещитываем
-            uli bouble = sum_befor_div((*i).last_ch);// xzxz
-            for (; bouble < cur && found(bouble, l_roundlayes); bouble = sum_befor_div(bouble))
-                ;
-            (*i).last_ch = bouble;
-            if (bouble < cur)
-                kill_list.push_back((*i).ch);
-        }
-    kill(kill_list, l_roundlayes);
-}
+// not using
+//void clear_l_roundlayes(list <el_round> &l_roundlayes, uli cur){
+//    list <uli> kill_list;
+//    for (list <el_round>::iterator i = l_roundlayes.begin(); i != l_roundlayes.end() ; ++i)
+//        if ((*i).last_ch > cur)
+//            continue;
+//        else{ // иначе перещитываем
+//            uli bouble = sum_befor_div((*i).last_ch);// xzxz
+//            for (; bouble < cur && found(bouble, (*i).hash_table); bouble = sum_befor_div(bouble))
+//                ;
+//            (*i).last_ch = bouble;
+//            if (bouble < cur)
+//                kill_list.push_back((*i).ch);
+//        }
+//    el_round tmp;
+//    kill(kill_list, l_roundlayes, tmp.hash_table);
+//}
 
-void merge(list <uli> roundlaye, list <el_round> &l_roundlayes, uli cur){
+void merge(list <uli> roundlaye, list <el_round> &l_roundlayes){
     if (roundlaye.empty())
         return;
     //clear_l_roundlayes(l_roundlayes, cur);
@@ -105,17 +109,18 @@ void merge(list <uli> roundlaye, list <el_round> &l_roundlayes, uli cur){
             el_round tmp;
             tmp.ch = *i;
             tmp.last_ch = roundlaye.back();
+            hash_table[tmp.ch] = 1;
             l_roundlayes.push_back(tmp);
         }
     }
 }
 
-uli get_time(){
+uli get_time(){ // return time in minute
     time_t t;
     tm *t_m;
     t=time(NULL);
     t_m=localtime(&t);
-    return t_m->tm_hour*60 + t_m->tm_min*60 + t_m->tm_sec;
+    return t_m->tm_hour*60 + t_m->tm_min;//*60 + t_m->tm_sec;
 }
 
 void cultivate_arg(int argc, char *argv[], uli &last, uli &num_check, string &out_name){
@@ -159,15 +164,19 @@ int main(int argc, char *argv[])
 {
     list <el_round> l_roundlayes; // части хороводов в том числе и просто перспективные
     list <uli> max_roundlaye; // максимальный хоровод
-    list <int> time_list;
+    list <uli> l_roundles_size_list; // максимальный хоровод
+    list <uli> time_list;
     string out_name;
     uli last;
     uli num_check; // number cout << progres << time
+    cout << LAST_ELEMENT;
+    hash_table = new bool[LAST_ELEMENT+1];
+    for (uli i = 0; i<=LAST_ELEMENT+1; i++)
+        hash_table[i]=0;
 //    cout << "15472 == " <<
 //            sum_bbefor_div(sum_befor_div(sum_befor_div(sum_befor_div(sum_befor_div(15472)))))
 //         << "\n";
-    //cout << " " << sum_befor_div(sum_befor_div(4600)) ;
-
+//    cout << " " << sum_befor_div(sum_befor_div(4600)) ;
     cultivate_arg(argc, argv, last, num_check, out_name);
     time_list.push_back(get_time());
     cout << "\nLocal time is: " << get_time() << "\n Program begin\n";
@@ -185,10 +194,11 @@ int main(int argc, char *argv[])
                 el_round tmp;
                 tmp.ch = cur;
                 tmp.last_ch = buble;
+                hash_table[tmp.ch] = 1;
                 l_roundlayes.push_back(tmp);
                 break;
             }
-            if (buble == 1 || buble == cur || !found(buble, l_roundlayes)) // цепь ведет ясно куда..
+            if (buble == 1 || buble == cur || !found(buble)) // цепь ведет ясно куда..
             {
                 if (buble == cur) // да это цепочка - хоровод
                     if (cur_roundlaye.size() >= max_roundlaye.size()) // и длинна подходящая
@@ -199,13 +209,15 @@ int main(int argc, char *argv[])
             }
             cur_roundlaye.push_back(buble);
         }
-        merge(cur_roundlaye, l_roundlayes, cur);// добавим элементы в l_roundlayes
+        merge(cur_roundlaye, l_roundlayes);// добавим элементы в l_roundlayes
         if (num_check)
             if  (cur % (last/num_check) == 0)
             {// clear_l_roundlayes(l_roundlayes, cur);
                 cout << "\n!" << 100*cur/last << "%";
                 time_list.push_back(get_time()-time_list.front());
-                cout<<"Timer is: " << time_list.back();
+                l_roundles_size_list.push_back(l_roundlayes.size());
+                cout<< "Timer is: " << time_list.back();
+                cout << "\nSystem time is " << get_time();
 
             }
         if (cur == last)
@@ -213,14 +225,18 @@ int main(int argc, char *argv[])
             cout << "\n100% well done \n";
             time_list.push_back(get_time()-time_list.front());
             time_list.pop_front();
-            cout<<"Timer is: " << time_list.back();
+            cout <<"Timer is: " << time_list.back();
             ofstream out(out_name);
             out << max_roundlaye.size() << "\n";
             for (list <uli>::iterator i = max_roundlaye.begin(); i != max_roundlaye.end(); ++i)
                 out << (*i) << " ";
             out << "\n" << time_list.size();
             out << "\n";
-            for (list <int>::iterator i = time_list.begin(); i != time_list.end(); ++i)
+            for (list <uli>::iterator i = time_list.begin(); i != time_list.end(); ++i)
+                out << (*i) << " ";
+            out << "\n" << l_roundles_size_list.size();
+            out << "\n";
+            for (list <uli>::iterator i = l_roundles_size_list.begin(); i != l_roundles_size_list.end(); ++i)
                 out << (*i) << " ";
             break;
         }
@@ -230,6 +246,7 @@ int main(int argc, char *argv[])
     cout << "roundlaye: ";
     for (list <uli>::iterator i = max_roundlaye.begin(); i != max_roundlaye.end(); ++i)
         cout << *i << " ";
+    _getch();
     return 0;
 }
 
